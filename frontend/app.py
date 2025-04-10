@@ -20,6 +20,9 @@ if st.button("Predict"):
     try:
         response = requests.post("http://localhost:5000/prediction", json=payload)
         result = response.json()
-        st.success(f"Loan Status: {result['loan_approval_status']}")
+        if result['loan_approval_status'] == "Rejected":
+            st.error(f"Loan Status: {result['loan_approval_status']}")
+        else:
+            st.success(f"Loan Status: {result['loan_approval_status']}")
     except Exception as e:
         st.error(f"API Error: {e}")
