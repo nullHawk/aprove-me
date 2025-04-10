@@ -1,35 +1,18 @@
-from flask import Flask, request
-import pickle
+import subprocess
+import threading
+import time
 
-app = Flask(__name__)
+def run_backend():
+    subprocess.run(["python", "backend/app.py"])
 
-model = pickle.load(open("model/classifier.pkl", "rb"))
+def run_frontend():
+    time.sleep(2)  # Let Flask start up first
+    subprocess.run(["streamlit", "run", "frontend/app.py", "--server.port=7860", "--server.address=0.0.0.0"])
 
-@app.route("/prediction", methods=["POST"])
-def predict():
-    loan_req = request.get_json()
-    print(loan_req)
-    if loan_req['Gender'] == "Male":
-        Gender = 0
-    else:
-        Gender = 1
-    if loan_req['Married'] == "Unmarried":
-        Married = 0
-    else:
-        Married = 1
-    if loan_req['Credit_History'] == "Unclear Debts":
-        Credit_History = 0
-    else:
-        Credit_History = 1
-
-    ApplicantIncome = loan_req['ApplicantIncome']
-    LoanAmount = loan_req['LoanAmount']
-
-    result = model.predict([[Gender, Married, ApplicantIncome, LoanAmount, Credit_History]])
-
-    if result == 0:
-        pred = "Rejected"
-    else:
-        pred = "Approved"
-
-    return {"loan_approval_status": pred}
+if __name__ == "__main__":
+    t1 = threading.Thread(target=run_backend)
+    t2 = threading.Thread(target=run_frontend)
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
