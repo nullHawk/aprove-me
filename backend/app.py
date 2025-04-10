@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-model = pickle.load(open(os.path.join("model", "classifier.pkl"), "rb"))
+model = pickle.load(open(os.path.join("backend/model", "classifier.pkl"), "rb"))
 
 @app.route("/prediction", methods=["POST"])
 def predict():
